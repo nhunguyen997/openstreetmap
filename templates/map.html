@@ -7,7 +7,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <style>
 
-#btn-location{
+/* .btn{
     position: fixed;
     top: 50px;
     right: 0;
@@ -15,7 +15,7 @@
     background-color: gray;
     height: 40px;
     width: 70px;
-}
+} */
 
 #btn-findlatlon{
     position: fixed;
@@ -25,6 +25,7 @@
     background-color: gray;
     height: 40px;
     width: 70px;
+
 }
 
 #mapDiv{
@@ -40,9 +41,6 @@
     
 }
 
-#search-input{
-    
-}
 
 .field-input, .field-button{
     padding: 5px;
@@ -51,6 +49,26 @@
 .Field{
     padding: 15px 0 0 15px;
     float: left;
+}
+
+#search-button{
+    margin-left: -17px;
+}
+
+#btn{
+    position: absolute;
+    top: 0;
+    right: 0;
+    list-style: none;
+}
+
+.btn{
+    width: 60px;
+    padding: 5px;
+}
+
+#add-feature{
+    position: relative;
 }
 
 </style>
@@ -63,10 +81,21 @@
         <div id="search-button" class="Field">
             <button class="field-button" onclick="FindLatLon()">Find</button>
         </div>
+    
+        <div id="show_result"></div>
     </div>
     <div id="mapDiv"></div>
-    <button id="btn-location" onclick="getLocation()">current</button>
-    <button id="btn-findlatlon" onclick="FindLatlon('tiên lãng, hải phòng')"></button>
+    <div id="add-feature">
+        <ul id="btn">
+            <li><button id="btn-location" class="btn" onclick="getLocation()">current</button></li>
+            <li><button id="btn-addlocation" class="btn" onclick="AddNewLocation()">add</button></li>
+        </ul>
+       
+            
+        
+    </div>
+
+
     <script>
  
     var lat = 40.73;
@@ -95,7 +124,7 @@
 
     
         marker = L.marker([lat, lon]).addTo(map);
-        marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+        marker.bindPopup("lat:" + lat +"<br>lon:"+ lon).openPopup();
     
         }
 
@@ -127,11 +156,40 @@
         function FindLatLon(){
             address = $('.field-input').val();
             $.get(location.protocol + '//nominatim.openstreetmap.org/search?format=json&q='+address, function(data){
-            lat = parseFloat(data[0]['lat']);
-            lon = parseFloat(data[0]['lon']);
+                if (data != null){
+                    var all_Vhtml = '';
+                   
+                    for(var i=0; i< data.length; i++){
+
+                        var Vhtml = ""
+                        Vhtml += "<div class='show_result_title' style='padding: 15px;' onclick='GoToAddress(";
+                            Vhtml += data[i]['lat'];
+                            Vhtml += ',';
+                            Vhtml += data[i]['lon'];
+                            Vhtml += ")'>";
+                        Vhtml += data[i]['display_name'];
+                        Vhtml += "</div>";
+                        all_Vhtml += Vhtml;
+                    }
+                    
+                }
+                all_Vhtml = "<div style='font-size:20px; padding:10px;'>Result search</div>" + all_Vhtml;
+                console.log(all_Vhtml);
+                $('#show_result').html(all_Vhtml);
+                console.log(data);
+                lat = parseFloat(data[0]['lat']);
+                lon = parseFloat(data[0]['lon']);
+                marker = L.marker([lat, lon]).addTo(map);
+                map.setView([lat, lon], 13);
+            });
+        }
+        
+        function GoToAddress(lat,lon)
+        {
+            lat = parseFloat(lat);
+            lon = parseFloat(lon);
             marker = L.marker([lat, lon]).addTo(map);
             map.setView([lat, lon], 13);
-        });
         }
     </script>
 
