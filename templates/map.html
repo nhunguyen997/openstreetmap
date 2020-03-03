@@ -82,15 +82,15 @@
             <button class="field-button" onclick="FindLatLon()">Find</button>
         </div>
     
-        <div id="show_result"></div>
+        <div id="show_result" style="margin-top: 40px;position: relative;"></div>
     </div>
     <div id="mapDiv"></div>
     <div id="add-feature">
         <ul id="btn">
             <li><button id="btn-location" class="btn" onclick="getLocation()">current</button></li>
-            <li><button id="btn-addlocation" class="btn" onclick="AddNewLocation()">add</button></li>
+            <!-- <li><button id="btn-addlocation" class="btn" onclick="AddNewLocation()">add</button></li> -->
         </ul>
-       
+  
             
         
     </div>
@@ -173,7 +173,7 @@
                     }
                     
                 }
-                all_Vhtml = "<div style='font-size:20px; padding:10px;'>Result search</div>" + all_Vhtml;
+                all_Vhtml = "<div style='font-size:20px; padding:10px;'>Result search<div class='close' onclick='Close()' style='display: inline-block;right: 20px;position: absolute;'>X</div></div>" + all_Vhtml;
                 console.log(all_Vhtml);
                 $('#show_result').html(all_Vhtml);
                 console.log(data);
@@ -190,6 +190,59 @@
             lon = parseFloat(lon);
             marker = L.marker([lat, lon]).addTo(map);
             map.setView([lat, lon], 13);
+        }
+
+        function AddLocation(){
+            var name = '';
+            var address = '';
+            var description = '';
+            name = $('#field-name').val();
+            address = $('#field-address').val();
+            description = $('#field-description').val();
+            console.log(name, address, description);
+            var geojsonFeature = {
+            "type": "Feature",
+            "properties": {
+                "name": name,
+                "amenity": address,
+                "popupContent": description
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [40.750281, -73.986268]
+            }
+        };
+
+
+        function onEachFeature(feature, layer) {
+    // does this feature have a property named popupContent?
+            if (feature.properties && feature.properties.popupContent) {
+                layer.bindPopup(feature.properties.popupContent);
+            }
+        }
+
+        var geojsonFeature = {
+            "type": "Feature",
+            "properties": {
+                "name": "Coors Field",
+                "amenity": "Baseball Stadium",
+                "popupContent": "This is where the Rockies play!"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-104.99404, 39.75621]
+            }
+        };
+
+        L.geoJSON(geojsonFeature, {
+            onEachFeature: onEachFeature
+        }).addTo(map);
+            map.setView([-104.99404, 39.75621], 15);
+        }
+        
+        function Close(){
+            document.getElementById('show_result').style.display = 'none';
+            $('.field-input').val('');
         }
     </script>
 
